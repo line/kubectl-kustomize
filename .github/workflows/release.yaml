@@ -1,5 +1,7 @@
 name: Release
-on: push
+on:
+  schedule:
+  - cron: "0 */8 * * *"
 jobs:
   release:
     runs-on: ubuntu-18.04
