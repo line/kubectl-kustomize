@@ -1,5 +1,8 @@
 name: Release
 on:
+  push:
+    branches:
+    - master
   schedule:
   - cron: "0 */8 * * *"
 jobs:
@@ -17,13 +20,20 @@ jobs:
         else
           exit 1
         fi
-    - name: Prepare checking latest kustomize version
-      run: docker build . -t devholic/kubectl-kustomize:kustomize-version --target latest-kustomize-version
+    - name: Prepare checking latest kustomize release
+      run: |
+        docker build . -t devholic/kubectl-kustomize:kustomize-version --target latest-kustomize-version
+        docker build . -t devholic/kubectl-kustomize:kustomize-url --target latest-kustomize-download-url
     - name: Check latest kustomize version
       id: kustomize
       run: |
         if version=$(docker run devholic/kubectl-kustomize:kustomize-version); then
           echo ::set-output name=version::$version
+        else
+          exit 1
+        fi
+        if url=$(docker run devholic/kubectl-kustomize:kustomize-url); then
+          echo ::set-output name=url::$url
         else
           exit 1
         fi
@@ -49,11 +59,11 @@ jobs:
       env:
         IMAGE_TAG: ${{ steps.image_existence.outputs.tag }}
         KUBECTL_VERSION: ${{ steps.kubectl.outputs.version }}
-        KUSTOMIZE_VERSION: ${{ steps.kustomize.outputs.version }}
+        KUSTOMIZE_DOWNLOAD_URL: ${{ steps.kustomize.outputs.url }}
       run: |
         docker build . -t devholic/kubectl-kustomize:${IMAGE_TAG} \
           --build-arg KUBECTL_VERSION=${KUBECTL_VERSION} \
-          --build-arg KUSTOMIZE_VERSION=${KUSTOMIZE_VERSION}
+          --build-arg KUSTOMIZE_DOWNLOAD_URL=${KUSTOMIZE_DOWNLOAD_URL}
         docker tag devholic/kubectl-kustomize:${IMAGE_TAG} devholic/kubectl-kustomize:latest
         echo ::set-output name=tag::${IMAGE_TAG}
     - name: Login to Docker Hub

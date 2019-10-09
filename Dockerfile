@@ -18,12 +18,28 @@ CMD [ \
 ]
 
 
-FROM build-base AS latest-kustomize-version
+FROM build-base AS latest-kustomize-release
+
+WORKDIR /tmp
+
+RUN curl -fs https://api.github.com/repos/kubernetes-sigs/kustomize/releases > .kustomize-latest-release
+
+
+FROM latest-kustomize-release AS latest-kustomize-version
 
 CMD [ \
-    "curl -fs https://api.github.com/repos/kubernetes-sigs/kustomize/releases | \
+    "cat .kustomize-latest-release | \
     jq -r 'first(.[] | select(.name | startswith(\"kustomize/\"))) | .name' | \
     sed -e 's/\\kustomize\\/v\\(.*\\)$/\\1/'" \
+]
+
+
+FROM latest-kustomize-release AS latest-kustomize-download-url
+
+CMD [ \
+    "cat .kustomize-latest-release | \
+    jq -r 'first(.[] | select(.name | startswith(\"kustomize/\"))) | \
+    first(.assets[] | select((.name | contains(\"linux\")) and (.name | contains(\"amd64\")))) | .browser_download_url'" \
 ]
 
 
@@ -31,14 +47,14 @@ CMD [ \
 FROM build-base AS downloader
 
 ARG KUBECTL_VERSION
-ARG KUSTOMIZE_VERSION
+ARG KUSTOMIZE_DOWNLOAD_URL
 
 WORKDIR /downloads
 
 RUN curl -fL https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o kubectl && \
     chmod +x kubectl
 
-RUN curl -fL https://github.com/kubernetes-sigs/kustomize/releases/download/v${KUSTOMIZE_VERSION}/kustomize_${KUSTOMIZE_VERSION}_linux_amd64 -o kustomize && \
+RUN curl -fL ${KUSTOMIZE_DOWNLOAD_URL} -o kustomize && \
     chmod +x kustomize
 
 
