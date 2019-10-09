@@ -22,8 +22,8 @@ FROM build-base AS latest-kustomize-version
 
 CMD [ \
     "curl -fs https://api.github.com/repos/kubernetes-sigs/kustomize/releases | \
-    jq -r '[.[]|select(.name|test(\"^v.*\"))] | first.name' | \
-    sed -e 's/\\v\\(.*\\)$/\\1/'" \
+    jq -r 'first(.[] | select(.name | startswith(\"kustomize/\"))) | .name' | \
+    sed -e 's/\\kustomize\\/v\\(.*\\)$/\\1/'" \
 ]
 
 
