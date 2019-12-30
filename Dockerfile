@@ -54,7 +54,7 @@ WORKDIR /downloads
 RUN curl -fL https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o kubectl && \
     chmod +x kubectl
 
-RUN curl -fL ${KUSTOMIZE_DOWNLOAD_URL} -o kustomize && \
+RUN curl -fL ${KUSTOMIZE_DOWNLOAD_URL} | tar xz && \
     chmod +x kustomize
 
 
