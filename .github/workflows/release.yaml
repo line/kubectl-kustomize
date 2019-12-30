@@ -66,6 +66,11 @@ jobs:
           --build-arg KUSTOMIZE_DOWNLOAD_URL=${KUSTOMIZE_DOWNLOAD_URL}
         docker tag devholic/kubectl-kustomize:${IMAGE_TAG} devholic/kubectl-kustomize:latest
         echo ::set-output name=tag::${IMAGE_TAG}
+    - name: Validate image
+      if: steps.build.outputs.tag
+      env:
+        IMAGE_TAG: ${{ steps.image_existence.outputs.tag }}
+      run: docker run --rm devholic/kubectl-kustomize:${IMAGE_TAG} -c "kubectl && kustomize"
     - name: Login to Docker Hub
       if: steps.build.outputs.tag
       uses: azure/docker-login@v1
