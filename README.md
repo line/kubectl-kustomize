@@ -2,12 +2,12 @@
 
 Docker image with kubectl and kustomize
 
-[![GitHub Actions](https://github.com/devholic/kubectl-kustomize/workflows/Release/badge.svg)](https://github.com/devholic/kubectl-kustomize/actions?workflowID=Release) [![Docker Pulls](https://img.shields.io/docker/pulls/devholic/kubectl-kustomize)](https://hub.docker.com/r/devholic/kubectl-kustomize)
+[![GitHub Actions](https://github.com/line/kubectl-kustomize/workflows/Release/badge.svg)](https://github.com/line/kubectl-kustomize/actions?workflowID=Release) [![Docker Pulls](https://img.shields.io/docker/pulls/line/kubectl-kustomize)](https://hub.docker.com/r/line/kubectl-kustomize)
 
 ## Quickstart
 
 ```sh
-docker run --rm -v {YOUR_LOCAL_K8S_CONFIG_DIR}:/root/.kube:ro -ti devholic/kubectl-kustomize:latest
+docker run --rm -v {YOUR_LOCAL_K8S_CONFIG_DIR}:/root/.kube:ro -ti line/kubectl-kustomize:latest
 ```
 
 ## About this image

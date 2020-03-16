@@ -61,7 +61,7 @@ RUN curl -fL ${KUSTOMIZE_DOWNLOAD_URL} | tar xz && \
 # Runtime
 FROM base AS runtime
 
-LABEL maintainer="Sunghoon Kang <me@devholic.io>"
+LABEL maintainer="LINE Open Source <dl_oss_dev@linecorp.com>"
 
 COPY --from=downloader /downloads/kubectl /usr/local/bin/kubectl
 COPY --from=downloader /downloads/kustomize /usr/local/bin/kustomize

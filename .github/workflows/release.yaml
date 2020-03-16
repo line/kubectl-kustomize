@@ -11,28 +11,28 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Prepare checking latest kubectl version
-      run: docker build . -t devholic/kubectl-kustomize:kubectl-version --target latest-kubectl-version
+      run: docker build . -t line/kubectl-kustomize:kubectl-version --target latest-kubectl-version
     - name: Check latest kubectl version
       id: kubectl
       run: |
-        if version=$(docker run devholic/kubectl-kustomize:kubectl-version); then
+        if version=$(docker run line/kubectl-kustomize:kubectl-version); then
           echo ::set-output name=version::$version
         else
           exit 1
         fi
     - name: Prepare checking latest kustomize release
       run: |
-        docker build . -t devholic/kubectl-kustomize:kustomize-version --target latest-kustomize-version
-        docker build . -t devholic/kubectl-kustomize:kustomize-url --target latest-kustomize-download-url
+        docker build . -t line/kubectl-kustomize:kustomize-version --target latest-kustomize-version
+        docker build . -t line/kubectl-kustomize:kustomize-url --target latest-kustomize-download-url
     - name: Check latest kustomize version
       id: kustomize
       run: |
-        if version=$(docker run devholic/kubectl-kustomize:kustomize-version); then
+        if version=$(docker run line/kubectl-kustomize:kustomize-version); then
           echo ::set-output name=version::$version
         else
           exit 1
         fi
-        if url=$(docker run devholic/kubectl-kustomize:kustomize-url); then
+        if url=$(docker run line/kubectl-kustomize:kustomize-url); then
           echo ::set-output name=url::$url
         else
           exit 1
@@ -44,7 +44,7 @@ jobs:
       shell: bash +e {0}
       run: |
         echo ::set-output name=tag::${IMAGE_TAG}
-        result="$(DOCKER_CLI_EXPERIMENTAL=enabled docker manifest inspect devholic/kubectl-kustomize:${IMAGE_TAG} 2>&1)"
+        result="$(DOCKER_CLI_EXPERIMENTAL=enabled docker manifest inspect line/kubectl-kustomize:${IMAGE_TAG} 2>&1)"
         if [[ $? -eq 0 ]]; then
           echo ::set-output name=exists::true
         elif [[ $result == *"no such manifest"* ]]; then
@@ -61,26 +61,26 @@ jobs:
         KUBECTL_VERSION: ${{ steps.kubectl.outputs.version }}
         KUSTOMIZE_DOWNLOAD_URL: ${{ steps.kustomize.outputs.url }}
       run: |
-        docker build . -t devholic/kubectl-kustomize:${IMAGE_TAG} \
+        docker build . -t line/kubectl-kustomize:${IMAGE_TAG} \
           --build-arg KUBECTL_VERSION=${KUBECTL_VERSION} \
           --build-arg KUSTOMIZE_DOWNLOAD_URL=${KUSTOMIZE_DOWNLOAD_URL}
-        docker tag devholic/kubectl-kustomize:${IMAGE_TAG} devholic/kubectl-kustomize:latest
+        docker tag line/kubectl-kustomize:${IMAGE_TAG} line/kubectl-kustomize:latest
         echo ::set-output name=tag::${IMAGE_TAG}
     - name: Validate image
       if: steps.build.outputs.tag
       env:
         IMAGE_TAG: ${{ steps.image_existence.outputs.tag }}
-      run: docker run --rm devholic/kubectl-kustomize:${IMAGE_TAG} -c "kubectl && kustomize"
+      run: docker run --rm line/kubectl-kustomize:${IMAGE_TAG} -c "kubectl && kustomize"
     - name: Login to Docker Hub
       if: steps.build.outputs.tag
       uses: azure/docker-login@v1
       with:
-        username: devholic
+        username: line
         password: ${{ secrets.DOCKER_PASSWORD }}
     - name: Push image
       if: steps.build.outputs.tag
       env:
         IMAGE_TAG: ${{ steps.build.outputs.tag }}
       run: |
-        docker push devholic/kubectl-kustomize:${IMAGE_TAG}
-        docker push devholic/kubectl-kustomize:latest
+        docker push line/kubectl-kustomize:${IMAGE_TAG}
+        docker push line/kubectl-kustomize:latest
