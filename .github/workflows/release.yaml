@@ -75,7 +75,7 @@ jobs:
       if: steps.build.outputs.tag
       uses: azure/docker-login@v1
       with:
-        username: line
+        username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
     - name: Push image
       if: steps.build.outputs.tag
