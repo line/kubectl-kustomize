@@ -87,7 +87,7 @@ jobs:
           --builder ${BUILDER_INSTANCE} \
           --tag ${REPO_OWNER}/kubectl-kustomize:${IMAGE_TAG} \
           --tag ${REPO_OWNER}/kubectl-kustomize:latest \
-          --platform linux/amd64 \
+          --platform linux/amd64,linux/arm64 \
           --push \
           --build-arg KUBECTL_VERSION=${KUBECTL_VERSION} \
           --build-arg KUSTOMIZE_VERSION=${KUSTOMIZE_VERSION} \
