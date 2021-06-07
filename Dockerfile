@@ -33,28 +33,20 @@ CMD [ \
     sed -e 's/\\kustomize\\/v\\(.*\\)$/\\1/'" \
 ]
 
-
-FROM latest-kustomize-release AS latest-kustomize-download-url
-
-CMD [ \
-    "cat .kustomize-latest-release | \
-    jq -r 'first(.[] | select(.name | startswith(\"kustomize/\"))) | \
-    first(.assets[] | select((.name | contains(\"linux\")) and (.name | contains(\"amd64\")))) | .browser_download_url'" \
-]
-
-
 # Downloader
 FROM build-base AS downloader
 
+ARG TARGETOS
+ARG TARGETARCH
 ARG KUBECTL_VERSION
-ARG KUSTOMIZE_DOWNLOAD_URL
+ARG KUSTOMIZE_VERSION
 
 WORKDIR /downloads
 
-RUN curl -fL https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/linux/amd64/kubectl -o kubectl && \
+RUN set -ex; curl -fL https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/${TARGETOS}/${TARGETARCH}/kubectl -o kubectl && \
     chmod +x kubectl
 
-RUN curl -fL ${KUSTOMIZE_DOWNLOAD_URL} | tar xz && \
+RUN set -ex; curl -fL https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v${KUSTOMIZE_VERSION}/kustomize_v${KUSTOMIZE_VERSION}_${TARGETOS}_${TARGETARCH}.tar.gz | tar xz && \
     chmod +x kustomize
 
 
@@ -65,5 +57,7 @@ LABEL maintainer="LINE Open Source <dl_oss_dev@linecorp.com>"
 
 COPY --from=downloader /downloads/kubectl /usr/local/bin/kubectl
 COPY --from=downloader /downloads/kustomize /usr/local/bin/kustomize
+
+RUN set -ex; kubectl && kustomize
 
 ENTRYPOINT ["sh"]
