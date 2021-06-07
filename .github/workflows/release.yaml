@@ -12,22 +12,30 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Prepare checking latest kubectl version
-      run: docker build . -t line/kubectl-kustomize:kubectl-version --target latest-kubectl-version
+      env:
+        REPO_OWNER: ${{github.repository_owner}}
+      run: docker build . -t ${REPO_OWNER}/kubectl-kustomize:kubectl-version --target latest-kubectl-version
     - name: Check latest kubectl version
       id: kubectl
+      env:
+        REPO_OWNER: ${{github.repository_owner}}
       run: |
-        if version=$(docker run line/kubectl-kustomize:kubectl-version); then
+        if version=$(docker run ${REPO_OWNER}/kubectl-kustomize:kubectl-version); then
           echo ::set-output name=version::$version
         else
           exit 1
         fi
     - name: Prepare checking latest kustomize release
+      env:
+        REPO_OWNER: ${{github.repository_owner}}
       run: |
-        docker build . -t line/kubectl-kustomize:kustomize-version --target latest-kustomize-version
+        docker build . -t ${REPO_OWNER}/kubectl-kustomize:kustomize-version --target latest-kustomize-version
     - name: Check latest kustomize version
       id: kustomize
+      env:
+        REPO_OWNER: ${{github.repository_owner}}
       run: |
-        if version=$(docker run line/kubectl-kustomize:kustomize-version); then
+        if version=$(docker run ${REPO_OWNER}/kubectl-kustomize:kustomize-version); then
           echo ::set-output name=version::$version
         else
           exit 1
@@ -36,10 +44,11 @@ jobs:
       id: image_existence
       env:
         IMAGE_TAG: ${{ format('{0}-{1}', steps.kubectl.outputs.version, steps.kustomize.outputs.version) }}
+        REPO_OWNER: ${{github.repository_owner}}
       shell: bash +e {0}
       run: |
         echo ::set-output name=tag::${IMAGE_TAG}
-        result="$(DOCKER_CLI_EXPERIMENTAL=enabled docker manifest inspect line/kubectl-kustomize:${IMAGE_TAG} 2>&1)"
+        result="$(DOCKER_CLI_EXPERIMENTAL=enabled docker manifest inspect ${REPO_OWNER}/kubectl-kustomize:${IMAGE_TAG} 2>&1)"
         if [[ $? -eq 0 ]]; then
           echo ::set-output name=exists::true
         elif [[ $result == *"no such manifest"* ]]; then
@@ -72,11 +81,12 @@ jobs:
         IMAGE_TAG: ${{ steps.image_existence.outputs.tag }}
         KUBECTL_VERSION: ${{ steps.kubectl.outputs.version }}
         KUSTOMIZE_VERSION: ${{ steps.kustomize.outputs.version }}
+        REPO_OWNER: ${{github.repository_owner}}
       run: |
         docker buildx build \
           --builder ${BUILDER_INSTANCE} \
-          --tag line/kubectl-kustomize:${IMAGE_TAG} \
-          --tag line/kubectl-kustomize:latest \
+          --tag ${REPO_OWNER}/kubectl-kustomize:${IMAGE_TAG} \
+          --tag ${REPO_OWNER}/kubectl-kustomize:latest \
           --platform linux/amd64 \
           --push \
           --build-arg KUBECTL_VERSION=${KUBECTL_VERSION} \
