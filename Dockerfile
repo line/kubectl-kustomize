@@ -17,7 +17,7 @@ RUN set -ex; \
 
 
 # Runtime
-FROM alpine:3.13.5 AS runtime
+FROM alpine:3.14.3 AS runtime
 
 LABEL maintainer="LINE Open Source <dl_oss_dev@linecorp.com>"
 
