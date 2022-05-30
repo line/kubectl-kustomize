@@ -1,4 +1,4 @@
-FROM curlimages/curl:7.78.0 AS downloader
+FROM curlimages/curl:7.83.1 AS downloader
 
 ARG TARGETOS
 ARG TARGETARCH
@@ -17,7 +17,7 @@ RUN set -ex; \
 
 
 # Runtime
-FROM alpine:3.14.3 AS runtime
+FROM alpine:3.16.0 AS runtime
 
 LABEL maintainer="LINE Open Source <dl_oss_dev@linecorp.com>"
 
