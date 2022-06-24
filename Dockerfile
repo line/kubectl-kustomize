@@ -24,8 +24,6 @@ LABEL maintainer="LINE Open Source <dl_oss_dev@linecorp.com>"
 COPY --from=downloader /downloads/kubectl /usr/local/bin/kubectl
 COPY --from=downloader /downloads/kustomize /usr/local/bin/kustomize
 
-ENTRYPOINT ["sh"]
-
 
 # Test
 FROM runtime AS test
