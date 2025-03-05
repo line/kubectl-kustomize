@@ -6,7 +6,7 @@ on:
   workflow_dispatch: {}
 jobs:
   fetch-metadata:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     outputs:
       kubectl-version: ${{ steps.kubectl.outputs.version }}
       kustomize-version: ${{ steps.kustomize.outputs.version }}
@@ -79,7 +79,7 @@ jobs:
             exit 1;
           fi
   release:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     needs:
       - fetch-metadata
     steps:
