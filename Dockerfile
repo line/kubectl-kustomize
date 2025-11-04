@@ -8,7 +8,7 @@ ARG KUSTOMIZE_VERSION
 WORKDIR /downloads
 
 RUN set -ex; \
-    curl -fL https://storage.googleapis.com/kubernetes-release/release/v${KUBECTL_VERSION}/bin/${TARGETOS}/${TARGETARCH}/kubectl -o kubectl && \
+    curl -fL https://dl.k8s.io/release/v${KUBECTL_VERSION}/bin/${TARGETOS}/${TARGETARCH}/kubectl -o kubectl && \
     chmod +x kubectl
 
 RUN set -ex; \
